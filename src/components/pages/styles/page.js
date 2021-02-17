@@ -37,6 +37,7 @@ border-bottom: 1px solid gray;
 export const LocationError = styled.div`
 color: red;
 text-align: center;
+height:122px;
 `
 
 export const LocationSuccess = styled.div`
@@ -47,6 +48,7 @@ justify-content: center;
 
 export const AllLocationsContainer = styled.div`
 display:flex;
+width: 560px;
 flex-direction: row;
 align-items: center;
 border: 1px solid #CCC;
@@ -56,6 +58,7 @@ padding:20px;
 @media(max-width:600px)
   {
     padding:2vw;
+    width: 95%
   }
 
 `

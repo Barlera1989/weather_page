@@ -23,10 +23,14 @@ const MainPage = () => {
   const [input, setInput] = useState('')
   const [submitted, setSubmitted] = useState('')
   const [clickedCard, SetClickedCard] = useState({})
-  const [AllCards, SetAllCards] = useState([])
+  const [allCards, SetAllCards] = useState([])
+  const [showLoad, SetShowLoad] = useState(false)
 
 
   const get_main_card_data = () => {
+
+
+
     axios.get(`http://127.0.0.1:5000/weather/${input}`)
       .then(resp => {
 
@@ -54,6 +58,7 @@ const MainPage = () => {
     axios.get(`http://127.0.0.1:5000/weather?max=5`)
       .then(resp => {
 
+
         /* get data to all cards */
         SetAllCards(resp.data)
 
@@ -67,17 +72,27 @@ const MainPage = () => {
   }
 
 
+  const hideLoading = () => {
+    SetShowLoad(false)
+  }
+
+
   const clickOutsideInput = () => {
+
+
 
     /* check if the input was already submitted.
         this avoids a double action when
         after enter key event and click outside 
         the input event */
     if (submitted !== input) {
-
+      SetShowLoad(true)
       get_main_card_data()
       /* delay a bit the second request */
-      setTimeout(get_all_card_data, 2000)
+      setTimeout(get_all_card_data, 2500)
+      setTimeout(hideLoading, 2500)
+
+
     }
   }
 
@@ -103,6 +118,7 @@ const MainPage = () => {
               onBlur={clickOutsideInput}></CityEntry>
           </span>
           {pageTexts.textAfterInput}
+          {showLoad && <span style={{ color: 'red' }}> . . . Loading</span>}
         </LocationQuestion>
 
         {showError && <LocationError>{pageTexts.errorMessage}</LocationError>}
@@ -115,12 +131,12 @@ const MainPage = () => {
         </LocationSuccess>}
 
         {showAllCards && <AllLocationsContainer>
-          {AllCards.map((AllCards, i) => (
+          {allCards.map((allCards, i) => (
             <div key={i}>
               <WeatherCard
-                cityName={AllCards.City_name}
-                temperature={`${AllCards.City_temp}°C`}
-                weather={AllCards.City_condition} />
+                cityName={allCards.City_name}
+                temperature={`${allCards.City_temp}°C`}
+                weather={allCards.City_condition} />
             </div>
 
           ))}
