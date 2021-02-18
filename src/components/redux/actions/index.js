@@ -116,11 +116,17 @@ export const requestMainCardData = (input) => (dispatch) => {
 
       /* set main card to true */
       dispatch(setShowCardTrue())
+
+      /* set all cards to true */
+      dispatch(setShowAllCardsTrue())
     })
     .catch(() => {
 
       /* set main card to false */
       dispatch(setShowCardFalse())
+
+      /* set all cards to true */
+      dispatch(setShowAllCardsTrue())
 
       /* show error message */
       dispatch(setShowErrorTrue())
@@ -135,8 +141,6 @@ export const requestAllCardData = () => (dispatch) => {
       /* get data to all cards */
       dispatch(SetAllCardsData(resp.data))
 
-      /* set all cards to true */
-      dispatch(setShowAllCardsTrue())
 
     })
     .catch(() => {
