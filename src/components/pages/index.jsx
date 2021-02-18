@@ -125,18 +125,18 @@ const MainPage = () => {
 
         {showCards && <LocationSuccess>
           <WeatherCard
-            cityName={clickedCard.City_name}
-            temperature={`${clickedCard.City_temp}°C`}
-            weather={clickedCard.City_condition} />
+            cityName={clickedCard.city_name}
+            temperature={`${clickedCard.city_temperature}°C`}
+            weather={clickedCard.city_condition} />
         </LocationSuccess>}
 
         {showAllCards && <AllLocationsContainer>
           {allCards.map((allCards, i) => (
             <div key={i}>
               <WeatherCard
-                cityName={allCards.City_name}
-                temperature={`${allCards.City_temp}°C`}
-                weather={allCards.City_condition} />
+                cityName={allCards.city_name}
+                temperature={`${allCards.city_temperature}°C`}
+                weather={allCards.city_condition} />
             </div>
 
           ))}
