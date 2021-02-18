@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import axios from 'axios'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   MainContainer,
@@ -10,98 +10,79 @@ import {
   LocationSuccess,
   AllLocationsContainer,
   CityEntry,
+  Loading
 } from './styles/page'
+
+import {
+  SetShowLoadTrue,
+  SetShowLoadFalse,
+  setSubmittedData,
+  setInputData,
+  requestMainCardData,
+  requestAllCardData
+} from '../redux/actions'
+
 
 import WeatherCard from './weather_card'
 import pageTexts from './constants'
 
 
 const MainPage = () => {
-  const [showAllCards, setShowAllCards] = useState(false)
-  const [showCards, setShowCards] = useState(false)
-  const [showError, setShowError] = useState(false)
-  const [input, setInput] = useState('')
-  const [submitted, setSubmitted] = useState('')
-  const [clickedCard, SetClickedCard] = useState({})
-  const [allCards, SetAllCards] = useState([])
-  const [showLoad, SetShowLoad] = useState(false)
+  const dispatch = useDispatch()
+  const showAllCardsState = useSelector((state) => state.showAllCards.showAllCardsState)
+  const showCardsState = useSelector((state) => state.showCard.showCardState)
+  const showErrorState = useSelector((state) => state.showError.showErrorState)
+  const showLoadState = useSelector((state) => state.showLoading.showLoadingState)
+  const clickedCardState = useSelector((state) => state.clickedCardData.data)
+  const allCardsState = useSelector((state) => state.allCardsData)
+  const inputState = useSelector((state) => state.inputData.inputDataState)
+  const submittedState = useSelector((state) => state.submittedData.submittedDataState)
 
 
-  const get_main_card_data = () => {
-
-
-
-    axios.get(`http://127.0.0.1:5000/weather/${input}`)
-      .then(resp => {
-
-        /* get data to main card */
-        SetClickedCard(resp.data)
-
-        /* set message error to false, in case 
-        a message error was shown before */
-        setShowError(false)
-
-        /* set main card to true */
-        setShowCards(true)
-      })
-      .catch((error) => {
-
-        /* set main card to false */
-        setShowCards(false)
-
-        /* show error message */
-        setShowError(true)
-      })
-  }
-
-  const get_all_card_data = () => {
-    axios.get(`http://127.0.0.1:5000/weather?max=5`)
-      .then(resp => {
-
-
-        /* get data to all cards */
-        SetAllCards(resp.data)
-
-        /* set all cards to true */
-        setShowAllCards(true)
-      })
-      .catch((error) => {
-
-        setShowCards(false)
-      })
-  }
+  useEffect(() => {
+    if (inputState !== '') {
+      dispatch(requestAllCardData())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clickedCardState])
 
 
   const hideLoading = () => {
-    SetShowLoad(false)
+    dispatch(SetShowLoadFalse())
   }
 
 
   const clickOutsideInput = () => {
 
-
-
     /* check if the input was already submitted.
         this avoids a double action when
         after enter key event and click outside 
         the input event */
-    if (submitted !== input) {
-      SetShowLoad(true)
-      get_main_card_data()
-      /* delay a bit the second request */
-      setTimeout(get_all_card_data, 2500)
-      setTimeout(hideLoading, 2500)
+
+
+    if (submittedState !== inputState) {
+
+
+      dispatch(SetShowLoadTrue())
+
+      dispatch(requestMainCardData(inputState))
+
+      dispatch(requestAllCardData())
+
+      setTimeout(hideLoading, 1000)
 
 
     }
   }
 
-  const EnterKeyAfterFillForms = (e) => {
-    setSubmitted(input)
-    if (e.key === 'Enter') {
-      clickOutsideInput();
-    }
+
+  const EnterKeyAfterFillForms = () => {
+
+    dispatch(setSubmittedData(inputState))
+
+    clickOutsideInput()
   }
+
 
 
   return (
@@ -113,37 +94,38 @@ const MainPage = () => {
           {pageTexts.textBeforeInput}
           <span>
             <CityEntry
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={EnterKeyAfterFillForms}
+              onChange={(e) => dispatch(setInputData(e.target.value))}
+              onKeyDown={(e) => { if (e.key === 'Enter') EnterKeyAfterFillForms() }}
               onBlur={clickOutsideInput}></CityEntry>
           </span>
           {pageTexts.textAfterInput}
-          {showLoad && <span style={{ color: 'red' }}> . . . Loading</span>}
+          {showLoadState && <Loading animate={{ rotate: 720 }}
+            transition={{ duration: 4 }} src={'logo192.png'} />}
         </LocationQuestion>
 
-        {showError && <LocationError>{pageTexts.errorMessage}</LocationError>}
+        {showErrorState && <LocationError>{pageTexts.errorMessage}</LocationError>}
 
-        {showCards && <LocationSuccess>
+        {showCardsState && <LocationSuccess>
           <WeatherCard
-            cityName={clickedCard.city_name}
-            temperature={`${clickedCard.city_temperature}°C`}
-            weather={clickedCard.city_condition} />
+            cityName={clickedCardState.city_name}
+            temperature={`${clickedCardState.city_temperature}°C`}
+            weather={clickedCardState.city_condition} />
         </LocationSuccess>}
 
-        {showAllCards && <AllLocationsContainer>
-          {allCards.map((allCards, i) => (
+        {showAllCardsState && <AllLocationsContainer>
+          {allCardsState.map((allCardsState, i) => (
             <div key={i}>
-              <WeatherCard
-                cityName={allCards.city_name}
-                temperature={`${allCards.city_temperature}°C`}
-                weather={allCards.city_condition} />
+              <WeatherCard delay={i + 1 / 5}
+                cityName={allCardsState.city_name}
+                temperature={`${allCardsState.city_temperature}°C`}
+                weather={allCardsState.city_condition} />
             </div>
 
           ))}
 
         </AllLocationsContainer>}
       </CenterContainer>
-    </MainContainer>
+    </MainContainer >
 
   )
 }
