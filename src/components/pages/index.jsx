@@ -10,6 +10,7 @@ import {
   LocationSuccess,
   AllLocationsContainer,
   CityEntry,
+  Loading
 } from './styles/page'
 
 import {
@@ -98,7 +99,8 @@ const MainPage = () => {
               onBlur={clickOutsideInput}></CityEntry>
           </span>
           {pageTexts.textAfterInput}
-          {showLoadState && <span style={{ color: 'red' }}> . . . Loading</span>}
+          {showLoadState && <Loading animate={{ rotate: 720 }}
+            transition={{ duration: 4 }} src={'logo192.png'} />}
         </LocationQuestion>
 
         {showErrorState && <LocationError>{pageTexts.errorMessage}</LocationError>}
@@ -113,7 +115,7 @@ const MainPage = () => {
         {showAllCardsState && <AllLocationsContainer>
           {allCardsState.map((allCardsState, i) => (
             <div key={i}>
-              <WeatherCard
+              <WeatherCard delay={i + 1 / 5}
                 cityName={allCardsState.city_name}
                 temperature={`${allCardsState.city_temperature}°C`}
                 weather={allCardsState.city_condition} />
